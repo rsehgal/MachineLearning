@@ -22,9 +22,9 @@ Y_test=testDataArr[:,9:10]
 
 Y_train=Y_train.reshape(X_train.shape[0])
 X_pred=RandomForest(X_train,Y_train,X_test,Y_test,writeToFile=True)
-print("========= Printing Returned Predicted Values +=============")
-print(X_pred)
-GradientBoosting(X_train,Y_train,X_test,Y_test,writeToFile=True)
+#print("========= Printing Returned Predicted Values +=============")
+#print(X_pred)
+#GradientBoosting(X_train,Y_train,X_test,Y_test,writeToFile=True)
 #DecisionTree(X_train,Y_train,X_test,Y_test)
 #LDA(X_train,Y_train,X_test,Y_test)
 #NearestNeighbours(X_train,Y_train,X_test,Y_test)

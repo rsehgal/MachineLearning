@@ -74,7 +74,15 @@ def RandomForest(X_train,Y_train,X_Test,Y_test,num_estimators=50,writeToFile=Fal
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
     
-    PlotROC(clf,X_test,Y_test)
+    #PlotROC(clf,X_test,Y_test)
+    PlotROCSci(clf,X_test,Y_test)
+    '''
+    y_probas = clf.predict_proba(X_test)
+    import scikitplot as skplt
+    skplt.metrics.plot_confusion_matrix(Y_test, X_pred, normalize=True)
+    skplt.metrics.plot_roc(Y_test, y_probas)
+    plt.show()
+    '''
     return X_pred
     
 
@@ -253,7 +261,16 @@ def WriteToFile(X_test,X_pred,functionName):
 	
 	np.savetxt(functionName,dataArray,delimiter=' ')
 	
-	
+
+def PlotROCSci(clf,X_test,Y_test):
+    X_pred = clf.predict(X_test)
+    y_probas = clf.predict_proba(X_test)
+    import scikitplot as skplt
+    skplt.metrics.plot_confusion_matrix(Y_test, X_pred, normalize=True)
+    skplt.metrics.plot_roc(Y_test, y_probas)
+    plt.show()
+
+
 	
 def PlotROC(clf,X_test,Y_test):
     import numpy as np
@@ -306,7 +323,7 @@ def PlotROC(clf,X_test,Y_test):
     plt.title('Some extension of Receiver operating characteristic to multi-class')
     plt.legend(loc="lower right")
     plt.show()
-    '''
+    
 
     '''
     print(X_pred.shape)
@@ -326,5 +343,5 @@ def PlotROC(clf,X_test,Y_test):
     import numpy as np
     filtDataArr=np.array(supList)
     np.savetxt("filteredTestPt.txt",filtDataArr,delimiter=",")
-
+    '''
 

@@ -52,7 +52,7 @@ def load_data(dataFileName):
     background=getBackgroundData(dataFileName)
     return signal, background
 
-def load_training_data(dataFileName,onlysignal):
+def load_training_data(dataFileName,onlysignal=False):
     signal=getSignalData(dataFileName)
     background=getBackgroundData(dataFileName)
     #dataArr=np.array(np.concatenate((signal,background),axis=0))

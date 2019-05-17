@@ -52,7 +52,7 @@ def MLP(X_train,Y_train,X_Test,Y_test,num_iter=100,act_func='tanh',writeToFile=F
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
-    return X_pred
+    return clf
 
 def RandomForest(X_train,Y_train,X_Test,Y_test,num_estimators=50,writeToFile=False):
     X_test=X_Test[:,0:6]
@@ -83,7 +83,7 @@ def RandomForest(X_train,Y_train,X_Test,Y_test,num_estimators=50,writeToFile=Fal
     skplt.metrics.plot_roc(Y_test, y_probas)
     plt.show()
     '''
-    return X_pred
+    return clf
     
 
 	
@@ -169,7 +169,7 @@ def GradientBoosting(X_train,Y_train,X_Test,Y_test,num_estimators=100,writeToFil
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
-    return X_pred
+    return clf
 
 
 def DecisionTree(X_train,Y_train,X_Test,Y_test,writeToFile=False):
@@ -183,7 +183,7 @@ def DecisionTree(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
-    return X_pred
+    return clf
 
 def AdaBoost(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     X_test=X_Test[:,0:6]
@@ -197,7 +197,7 @@ def AdaBoost(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
-    return X_pred
+    return clf
 
 def LDA(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     X_test=X_Test[:,0:6]
@@ -211,24 +211,24 @@ def LDA(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
-    return X_pred
+    return clf
 
 def NearestNeighbours(X_train,Y_train,X_Test,Y_test,num_neighbours=3,writeToFile=False):
     X_test=X_Test[:,0:6]
     print("========== %s Classifier =========" % whoami())
     from sklearn.neighbors import KNeighborsClassifier
-    neigh = KNeighborsClassifier(n_neighbors=num_neighbours)
+    clf = KNeighborsClassifier(n_neighbors=num_neighbours)
     Y_train=Y_train.reshape(X_train.shape[0])
-    neigh.fit(X_train,Y_train )
-    X_pred=neigh.predict(X_test)
+    clf = clf.fit(X_train,Y_train )
+    X_pred=clf.predict(X_test)
     #print(X_pred.shape)
     #print(X_test.shape)
-    score = neigh.score(X_test, Y_test)
+    score = clf.score(X_test, Y_test)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
-    return X_pred
+    return clf
     
 def whoami():
     import sys
@@ -269,6 +269,36 @@ def PlotROCSci(clf,X_test,Y_test):
     skplt.metrics.plot_confusion_matrix(Y_test, X_pred, normalize=True)
     skplt.metrics.plot_roc(Y_test, y_probas)
     plt.show()
+
+
+#Only for binary classifier
+def CalibrationPlot(X_train,Y_train,X_Test,Y_test):
+    import scikitplot as skplt
+    X_test=X_Test[:,0:6]
+    rf=RandomForest(X_train,Y_train,X_test,Y_test,writeToFile=True)
+    gb=GradientBoosting(X_train,Y_train,X_test,Y_test,writeToFile=True)
+    dt=DecisionTree(X_train,Y_train,X_test,Y_test)
+    lda=LDA(X_train,Y_train,X_test,Y_test)
+    nn=NearestNeighbours(X_train,Y_train,X_test,Y_test)
+    mlp=MLP(X_train,Y_train,X_test,Y_test)
+    adaboost=AdaBoost(X_train,Y_train,X_test,Y_test)
+
+    rf_probas=rf.predict_proba(X_test)
+    gb_probas=gb.predict_proba(X_test)
+    dt_probas=dt.predict_proba(X_test)
+    lda_probas=lda.predict_proba(X_test)
+    nn_probas=nn.predict_proba(X_test)
+    mlp_probas=mlp.predict_proba(X_test)
+    adaboost_probas=rf.predict_proba(X_test)
+    
+    print(rf_probas.shape)
+    
+    probas_list = [rf_probas,gb_probas,dt_probas,lda_probas,nn_probas,mlp_probas,adaboost_probas]
+
+    clf_names = ['RandomForest', 'GradientBoosting','DecisionTree', 'LDA','NearestNeighbours','MLP','AdaBoost']
+    skplt.metrics.plot_calibration_curve(Y_test, probas_list, clf_names)
+    plt.show()
+
 
 
 	

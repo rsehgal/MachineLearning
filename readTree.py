@@ -52,7 +52,7 @@ def load_data(dataFileName):
     background=getBackgroundData(dataFileName)
     return signal, background
 
-def load_training_data(dataFileName):
+def load_training_data(dataFileName,onlysignal):
     signal=getSignalData(dataFileName)
     background=getBackgroundData(dataFileName)
     #dataArr=np.array(np.concatenate((signal,background),axis=0))
@@ -60,7 +60,10 @@ def load_training_data(dataFileName):
     print(len(signal))
     print('Backgroundsize')
     print(len(background))
-    dataArr=np.concatenate((signal,background),axis=0)
+    if(onlysignal):
+        dataArr=signal
+    else:
+	dataArr=np.concatenate((signal,background),axis=0)
 
     #targetList=[]
     #for e in dataArr:

@@ -5,8 +5,10 @@ from scipy import interp
 import numpy as np
 import matplotlib.pyplot as plt
 
-def KerasClassfier(X_train,Y_train,X_test,Y_test,num_epoch=15):
-    print("========== Using Keras =========")
+def KerasClassfier(X_train,Y_train,X_Test,Y_test,num_epoch=15):
+    X_test=X_Test[:,0:6]
+
+    print("========== %s Classifier =========" % whoami())
     from keras.models import Sequential
     from keras.layers import Dense,Dropout
     from keras.utils import to_categorical
@@ -38,8 +40,9 @@ def KerasClassfier(X_train,Y_train,X_test,Y_test,num_epoch=15):
     matrix = confusion_matrix(Y_test.argmax(axis=1), Y_pred.argmax(axis=1))
     print(matrix)
 
-def MLP(X_train,Y_train,X_test,Y_test,num_iter=100,act_func='tanh'):
-    print("========== MLP Classifier =========")
+def MLP(X_train,Y_train,X_Test,Y_test,num_iter=100,act_func='tanh',writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s Classifier =========" % whoami())
     from sklearn.neural_network import MLPClassifier
     clf = MLPClassifier(max_iter=num_iter,activation=act_func)
     clf = clf.fit(X_train, Y_train)
@@ -47,9 +50,13 @@ def MLP(X_train,Y_train,X_test,Y_test,num_iter=100,act_func='tanh'):
     score = clf.score(X_test, Y_test)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+    return X_pred
 
-def RandomForest(X_train,Y_train,X_test,Y_test,num_estimators=50):
-    print("========== Random Forest Classifier =========")
+def RandomForest(X_train,Y_train,X_Test,Y_test,num_estimators=50,writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s Classifier =========" % whoami())
     from sklearn.ensemble import RandomForestClassifier
     clf = RandomForestClassifier(n_estimators=num_estimators)
     clf = clf.fit(X_train, Y_train)
@@ -64,9 +71,15 @@ def RandomForest(X_train,Y_train,X_test,Y_test,num_estimators=50):
     #print(roc_auc)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+    return X_pred
+    
 
-
+	
+    
     #===============================================================
+    '''
     model = clf
     y_test = Y_test
     y_predict_proba = model.predict_proba(X_test)
@@ -85,6 +98,8 @@ def RandomForest(X_train,Y_train,X_test,Y_test,num_estimators=50):
 	fpr[i], tpr[i], _ = roc_curve(y_test_i, y_predict_proba[:, i])
 	roc_auc[i] = auc(fpr[i], tpr[i])
 
+    print("========== Print TPR =============")
+    print(tpr[2])
     # Compute micro-average ROC curve and ROC area
     fpr["average"], tpr["average"], _ = roc_curve(all_y_test_i, all_y_predict_proba)
     roc_auc["average"] = auc(fpr["average"], tpr["average"])
@@ -111,7 +126,7 @@ def RandomForest(X_train,Y_train,X_test,Y_test,num_estimators=50):
     plt.title('Some extension of Receiver operating characteristic to multi-class')
     plt.legend(loc="lower right")
     plt.show()
-
+    '''
 
     '''
     print(X_pred.shape)
@@ -132,8 +147,9 @@ def RandomForest(X_train,Y_train,X_test,Y_test,num_estimators=50):
     filtDataArr=np.array(supList)
     np.savetxt("filteredTestPt.txt",filtDataArr,delimiter=",")
     '''
-def GradientBoosting(X_train,Y_train,X_test,Y_test,num_estimators=100):
-    print("========== Gradient Boosting Classifier =========")
+def GradientBoosting(X_train,Y_train,X_Test,Y_test,num_estimators=100,writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s Classifier =========" % whoami())
     from sklearn.ensemble import  GradientBoostingClassifier
     clf = GradientBoostingClassifier(n_estimators=num_estimators)
     clf = clf.fit(X_train, Y_train)
@@ -141,19 +157,27 @@ def GradientBoosting(X_train,Y_train,X_test,Y_test,num_estimators=100):
     score = clf.score(X_test, Y_test)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+    return X_pred
 
 
-def DecisionTree(X_train,Y_train,X_test,Y_test):
-    print("========== DecisionTree Classifier =========")
+def DecisionTree(X_train,Y_train,X_Test,Y_test,writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s Classifier =========" % whoami())
     clf = tree.DecisionTreeClassifier()
     clf = clf.fit(X_train, Y_train)
     X_pred=clf.predict(X_test)
     score = clf.score(X_test, Y_test)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+    return X_pred
 
-def AdaBoost(X_train,Y_train,X_test,Y_test):
-    print("========== AdaBoost Classifier =========")
+def AdaBoost(X_train,Y_train,X_Test,Y_test,writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s Classifier =========" % whoami())
     from sklearn.ensemble import AdaBoostClassifier
     clf = AdaBoostClassifier(    tree.DecisionTreeClassifier(max_depth=15),    n_estimators=100,    learning_rate=1.5,    algorithm="SAMME")
     clf = clf.fit(X_train, Y_train)
@@ -161,9 +185,13 @@ def AdaBoost(X_train,Y_train,X_test,Y_test):
     score = clf.score(X_test, Y_test)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+    return X_pred
 
-def LDA(X_train,Y_train,X_test,Y_test):
-    print("========== Linear Discriminant Classifier =========")
+def LDA(X_train,Y_train,X_Test,Y_test,writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s Classifier =========" % whoami())
     from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
     clf = LinearDiscriminantAnalysis()
     clf = clf.fit(X_train, Y_train)
@@ -171,9 +199,13 @@ def LDA(X_train,Y_train,X_test,Y_test):
     score = clf.score(X_test, Y_test)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+    return X_pred
 
-def NearestNeighbours(X_train,Y_train,X_test,Y_test,num_neighbours=3):
-    print("========== K Nearest Neighbour Classifier =========")
+def NearestNeighbours(X_train,Y_train,X_Test,Y_test,num_neighbours=3,writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s Classifier =========" % whoami())
     from sklearn.neighbors import KNeighborsClassifier
     neigh = KNeighborsClassifier(n_neighbors=num_neighbours)
     Y_train=Y_train.reshape(X_train.shape[0])
@@ -184,3 +216,42 @@ def NearestNeighbours(X_train,Y_train,X_test,Y_test,num_neighbours=3):
     score = neigh.score(X_test, Y_test)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+    return X_pred
+    
+def whoami():
+    import sys
+    return sys._getframe(1).f_code.co_name
+    
+def WriteToFile(X_test,X_pred,functionName):
+	supList=[]
+	counter=0
+	print(whoami())
+	#print(X_test)
+	print(X_test.shape)
+	print(X_pred.shape)
+	subList=X_test[0,6:9]
+	#print(subList)
+	
+	for e in X_test:
+		npSubList = e[6:9]
+		subList=[]
+		for n in npSubList:
+		    subList.append(n)
+		subList.append(X_pred[counter])
+		
+		counter=counter+1
+		supList.append(subList)
+	
+	dataArray=np.array(supList)
+	print(np.array(supList).shape)
+	
+#	dataArray=np.array([supList])
+	
+	np.savetxt(functionName,dataArray,delimiter=' ')
+	
+	
+	
+	
+

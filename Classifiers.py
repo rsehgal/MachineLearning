@@ -43,6 +43,7 @@ def KerasClassfier(X_train,Y_train,X_Test,Y_test,num_epoch=15):
 def MLP(X_train,Y_train,X_Test,Y_test,num_iter=100,act_func='tanh',writeToFile=False):
     X_test=X_Test[:,0:6]
     print("========== %s Classifier =========" % whoami())
+    print(num_iter)
     from sklearn.neural_network import MLPClassifier
     clf = MLPClassifier(max_iter=num_iter,activation=act_func)
     clf = clf.fit(X_train, Y_train)
@@ -57,6 +58,7 @@ def MLP(X_train,Y_train,X_Test,Y_test,num_iter=100,act_func='tanh',writeToFile=F
 def RandomForest(X_train,Y_train,X_Test,Y_test,num_estimators=50,writeToFile=False):
     X_test=X_Test[:,0:6]
     print("========== %s Classifier =========" % whoami())
+    print(num_estimators)
     from sklearn.ensemble import RandomForestClassifier
     clf = RandomForestClassifier(n_estimators=num_estimators)
     clf = clf.fit(X_train, Y_train)
@@ -152,6 +154,33 @@ def NearestNeighbours(X_train,Y_train,X_Test,Y_test,num_neighbours=3,writeToFile
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
     return clf
+    
+def Ensemble(X_train,Y_train,X_Test,Y_test,writeToFile=False):
+    print("========== %s Classifier =========" % whoami())
+    from sklearn.ensemble import VotingClassifier
+    X_test=X_Test[:,0:6]
+    rf=RandomForest(X_train,Y_train,X_test,Y_test,writeToFile=False,num_estimators=500)
+    gb=GradientBoosting(X_train,Y_train,X_test,Y_test,writeToFile=True)
+    dt=DecisionTree(X_train,Y_train,X_test,Y_test)
+    lda=LDA(X_train,Y_train,X_test,Y_test)
+    nn=NearestNeighbours(X_train,Y_train,X_test,Y_test)
+    mlp=MLP(X_train,Y_train,X_test,Y_test,num_iter=200)
+
+    estimators=[('gb', gb), ('dt', dt),  ('mlp', mlp),('rf',rf), ('nn',nn),('lda',lda)]
+    clf = VotingClassifier(estimators, voting='soft')
+    Y_train=Y_train.reshape(X_train.shape[0])
+    clf = clf.fit(X_train,Y_train )
+    X_pred=clf.predict(X_test)
+    score = clf.score(X_test, Y_test)
+    print("---------------------------------")
+    print(score)
+    print(confusion_matrix(Y_test,X_pred))
+    #PlotROC(clf,X_test,Y_test)
+    PlotROCSci(clf,X_test,Y_test)
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+    return clf
+
     
 def whoami():
     import sys

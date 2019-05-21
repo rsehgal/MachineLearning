@@ -1,6 +1,36 @@
 import numpy as np
 from root_numpy import root2array, tree2array
-from ROOT import TFile
+from ROOT import TFile, TTree, TList
+
+def CreateData(fileList,filename):
+    pathList = fileList #['test1.root', 'test2.root']
+    signalTreeList = TList()
+    backgroundTreeList=TList()
+    outputFile = TFile(filename, 'recreate')
+    pyfilelist = []
+    pySignalTreelist = []
+    pyBackgroundTreelist = []
+
+    for path in pathList:
+	    print("Path", path)
+	    inputFile = TFile(path, 'read')
+	    pyfilelist.append(inputFile) # Make this TFile survive the loop!
+	    inputSignalTree = inputFile.Get('Signal')
+	    inputBackgroundTree = inputFile.Get('Background')
+	    pySignalTreelist.append(inputSignalTree) # Make this TTree survive the loop!
+	    pyBackgroundTreelist.append(inputBackgroundTree) # Make this TTree survive the loop!
+	    outputSignalTree = inputSignalTree.CloneTree() #instead of extensive processing
+	    outputBackgroundTree = inputBackgroundTree.CloneTree() #instead of extensive processing
+	    signalTreeList.Add(inputSignalTree)
+	    backgroundTreeList.Add(inputBackgroundTree)
+
+    outputFile.cd()
+    outputSignalTree = TTree.MergeTrees(signalTreeList)
+    outputBackgroundTree = TTree.MergeTrees(backgroundTreeList)
+    outputFile.Write()
+    outputFile.Close()
+
+
 def getData(filename):
     arr=root2array(filename,"Signal")
     return arr

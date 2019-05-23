@@ -4,6 +4,11 @@ from sklearn.metrics import roc_curve, auc
 from scipy import interp
 import numpy as np
 import matplotlib.pyplot as plt
+from readTree import *
+
+#base learners for adaboost
+from sklearn.svm import SVC
+from sklearn import metrics
 
 def KerasClassfier(X_train,Y_train,X_Test,Y_test,num_epoch=15):
     X_test=X_Test[:,0:6]
@@ -70,14 +75,51 @@ def RandomForest(X_train,Y_train,X_Test,Y_test,num_estimators=50,writeToFile=Fal
     #fpr,tpr,thres= roc_curve(Y_test, score)
     #roc_auc = auc(fpr, tpr)
     print("========= ROC ===========")
+    print(X_Test.shape)
     #print(roc_auc)
     print(score)
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
     
-    #PlotROC(clf,X_test,Y_test)
-    PlotROCSci(clf,X_test,Y_test)
+    #PlotROCSci(clf,X_test,Y_test)
+    
+    #NoveltyDetection(X_test,X_pred)
+    
+    
+     
+    #Collected point which are predicted as Fe
+    ''' 
+    New Idea of remove outliers which are detected as iron.
+    Able to remove some outlier, but results  are not
+    upto expectation, hence commenting for the time being.
+    
+    But its working code
+    '''
+    
+    '''
+    counter = 0
+    iron = 0
+    supList=[]
+    Fe_pred=[]
+    for pred in X_pred:
+        subList=[]
+        if(pred==2):
+           Fe_pred.append(2)
+           iron = iron + 1
+           for e in X_Test[counter]:
+               subList.append(e) 
+           supList.append(subList)
+	counter = counter + 1
+	
+    dataArray=np.array(supList)
+    feArray=np.array(Fe_pred)
+    print("====== Iron Counter ======")
+    print(iron)
+    print(dataArray.shape)
+    
+    NoveltyDetection(dataArray,feArray,True)   
+    '''
 
     return clf
     
@@ -94,6 +136,8 @@ def GradientBoosting(X_train,Y_train,X_Test,Y_test,num_estimators=100,writeToFil
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
+    
+    PlotROCSci(clf,X_test,Y_test)
     return clf
 
 
@@ -114,7 +158,9 @@ def AdaBoost(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     X_test=X_Test[:,0:6]
     print("========== %s Classifier =========" % whoami())
     from sklearn.ensemble import AdaBoostClassifier
-    clf = AdaBoostClassifier(    tree.DecisionTreeClassifier(max_depth=15),    n_estimators=100,    learning_rate=1.5,    algorithm="SAMME")
+    #clf = AdaBoostClassifier(    tree.DecisionTreeClassifier(max_depth=15),    n_estimators=100,    learning_rate=1.5,    algorithm="SAMME")
+    svc=SVC(probability=True, kernel='linear')
+    clf = AdaBoostClassifier( base_estimator=svc,    n_estimators=10,    learning_rate=1) #,    algorithm="SAMME")
     clf = clf.fit(X_train, Y_train)
     X_pred=clf.predict(X_test)
     score = clf.score(X_test, Y_test)
@@ -122,6 +168,26 @@ def AdaBoost(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
+
+    PlotROCSci(clf,X_test,Y_test)
+    return clf
+    
+def Bagging(X_train,Y_train,X_Test,Y_test,writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s Classifier =========" % whoami())
+    from sklearn.ensemble import BaggingClassifier
+    #clf = AdaBoostClassifier(    tree.DecisionTreeClassifier(max_depth=15),    n_estimators=100,    learning_rate=1.5,    algorithm="SAMME")
+    svc=SVC(probability=True, kernel='linear')
+    clf = BaggingClassifier( n_estimators=100) 
+    clf = clf.fit(X_train, Y_train)
+    X_pred=clf.predict(X_test)
+    score = clf.score(X_test, Y_test)
+    print(score)
+    print(confusion_matrix(Y_test,X_pred))
+    if(writeToFile):
+      	WriteToFile(X_Test,X_pred,whoami())
+
+    PlotROCSci(clf,X_test,Y_test)
     return clf
 
 def LDA(X_train,Y_train,X_Test,Y_test,writeToFile=False):
@@ -181,7 +247,47 @@ def Ensemble(X_train,Y_train,X_Test,Y_test,writeToFile=False):
       	WriteToFile(X_Test,X_pred,whoami())
     return clf
 
-    
+def NoveltyDetection(X_Test,X_pred,writeToFile=False):
+    X_test=X_Test[:,0:6]
+    print("========== %s  =========" % whoami())
+    from sklearn import svm
+    clf = svm.OneClassSVM(nu=0.1, kernel="rbf", gamma=0.1)
+    dataArr=load_training_data("TMVA_Fe.root",True)
+    X=dataArr[:,0:6]
+    Y=dataArr[:,9:10]
+    X_train=X
+    clf.fit(X_train)
+    y_pred_train = clf.predict(X_train)
+    y_pred_test = clf.predict(X_test)
+    n_error_train = y_pred_train[y_pred_train == -1].size
+    n_error_test = y_pred_test[y_pred_test == -1].size
+    print("====== N_train_error ========")
+    print(n_error_train)
+    print("====== N_test_error ========")
+    print(n_error_test)
+    #n_error_test = y_pred_test[y_pred_test == -1].size
+  
+    supList=[]
+    counter = 0
+    predFe=[]
+    for pred in y_pred_test:
+        subList=[]
+        if(pred == 1):
+            predFe.append(2)
+	    for e in X_Test[counter]:
+		subList.append(e)
+
+	    supList.append(subList)
+        counter = counter + 1
+        
+    dataArray=np.array(supList) 
+    print("======== DataArray Shape =========")
+    print(dataArray.shape)
+    predArray=np.array(predFe)
+    if(writeToFile):
+        WriteToFile(dataArray,predArray,whoami())
+    return clf
+	
 def whoami():
     import sys
     return sys._getframe(1).f_code.co_name

@@ -21,10 +21,10 @@ X_test=testDataArr[:,0:9]
 Y_test=testDataArr[:,9:10]
 
 
-#KerasClassfier(X_train,Y_train,X_test,Y_test,5)
+#KerasClassfier(X_train,Y_train,X_test,Y_test,50)
 
 Y_train=Y_train.reshape(X_train.shape[0])
-#RandomForest(X_train,Y_train,X_test,Y_test,writeToFile=True,num_estimators=500)
+RandomForest(X_train,Y_train,X_test,Y_test,writeToFile=True,num_estimators=500)
 #print("========= Printing Returned Predicted Values +=============")
 #print(X_pred)
 #GradientBoosting(X_train,Y_train,X_test,Y_test,writeToFile=True)
@@ -32,7 +32,9 @@ Y_train=Y_train.reshape(X_train.shape[0])
 #LDA(X_train,Y_train,X_test,Y_test)
 #NearestNeighbours(X_train,Y_train,X_test,Y_test)
 #MLP(X_train,Y_train,X_test,Y_test)
-#AdaBoost(X_train,Y_train,X_test,Y_test)
+#AdaBoost(X_train,Y_train,X_test,Y_test,writeToFile=True)
+#Bagging(X_train,Y_train,X_test,Y_test,writeToFile=True)
 
 #CalibrationPlot(X_train,Y_train,X_test,Y_test)
-Ensemble(X_train,Y_train,X_test,Y_test,writeToFile=True)
+#Ensemble(X_train,Y_train,X_test,Y_test,writeToFile=True)
+#NoveltyDetection()

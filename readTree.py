@@ -93,7 +93,7 @@ def load_training_data(dataFileName,onlysignal=False):
     if(onlysignal):
         dataArr=signal
     else:
-	dataArr=np.concatenate((signal,background),axis=0)
+	   dataArr=np.concatenate((signal,background),axis=0)
 
     #targetList=[]
     #for e in dataArr:

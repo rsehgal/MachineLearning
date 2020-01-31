@@ -5,10 +5,19 @@ from scipy import interp
 import numpy as np
 import matplotlib.pyplot as plt
 from readTree import *
+from sklearn.mixture import GaussianMixture
 
 #base learners for adaboost
 from sklearn.svm import SVC
 from sklearn import metrics
+'''
+def GaussianMixtureModel(X_train,Y_train,X_Test,Y_test,writeToFile=False):
+    Y_sklearn = sklearn_pca.fit_transform(X_train)
+    gmm = GaussianMixture(n_components=4, covariance_type='full').fit(Y_sklearn)
+    score = gmm.score(X_test, Y_test)
+    print("Score : "+str(score))
+    return gmm
+'''    
 
 def KerasClassfier(X_train,Y_train,X_Test,Y_test,num_epoch=15):
     X_test=X_Test[:,0:6]
@@ -77,7 +86,7 @@ def RandomForest(X_train,Y_train,X_Test,Y_test,num_estimators=50,writeToFile=Fal
     print("========= ROC ===========")
     print(X_Test.shape)
     #print(roc_auc)
-    print(score)
+    print("Score : "+str(score))
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
@@ -148,10 +157,12 @@ def DecisionTree(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     clf = clf.fit(X_train, Y_train)
     X_pred=clf.predict(X_test)
     score = clf.score(X_test, Y_test)
-    print(score)
+    print("Score : "+str(score))
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
+          
+    #PlotROCSci(clf,X_test,Y_test)
     return clf
 
 def AdaBoost(X_train,Y_train,X_Test,Y_test,writeToFile=False):
@@ -198,7 +209,7 @@ def LDA(X_train,Y_train,X_Test,Y_test,writeToFile=False):
     clf = clf.fit(X_train, Y_train)
     X_pred=clf.predict(X_test)
     score = clf.score(X_test, Y_test)
-    print(score)
+    print("Score : "+str(score))
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
@@ -215,7 +226,7 @@ def NearestNeighbours(X_train,Y_train,X_Test,Y_test,num_neighbours=3,writeToFile
     #print(X_pred.shape)
     #print(X_test.shape)
     score = clf.score(X_test, Y_test)
-    print(score)
+    print("Score : "+str(score))
     print(confusion_matrix(Y_test,X_pred))
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
@@ -293,24 +304,57 @@ def whoami():
     return sys._getframe(1).f_code.co_name
     
 def WriteToFile(X_test,X_pred,functionName):
-	supList=[]
-	counter=0
-	print(whoami())
-	#print(X_test)
-	print(X_test.shape)
-	print(X_pred.shape)
-	subList=X_test[0,6:9]
-	#print(subList)
-	
+    supList=[]
+    supListRaw=[]
+    counter=0
+    print(whoami())
+    #print("Printing shapes..............")
+    print(X_test.shape)
+    print(X_pred.shape)
+    subList=X_test[0,6:9]
+    #print(subList)
+    print(X_pred)
+    for e in X_test:
+        #print(counter)
+        npSubList = e[6:9]
+        subList=[]
+        #subListRaw=[]
+        '''
+        if(X_pred[counter]!=0.0):
+            for n in npSubList:
+                subList.append(n)
+            subList.append(X_pred[counter])
+            supList.append(subList)
+        #else:
+        '''
+        for n in npSubList:
+            subList.append(n)
+        subList.append(X_pred[counter])
+        
+        supListRaw.append(subList)
+        if(X_pred[counter]!=0.0):
+            supList.append(subList)
+            
+            
+        counter=counter+1
+    dataArray=np.array(supList)
+    dataArrayRaw=np.array(supListRaw)
+    np.savetxt("Filtered"+functionName,dataArray,delimiter=' ')
+    np.savetxt("Raw"+functionName,dataArrayRaw,delimiter=' ')
+    
+    '''
 	for e in X_test:
-		npSubList = e[6:9]
-		subList=[]
-		for n in npSubList:
-		    subList.append(n)
-		subList.append(X_pred[counter])
+	    print(counter)
+	    npSubList = e[6:9]
+	    subList=[]
+	    print("Predited Values : "+str(X_pred[counter]))
+        if(X_pred[counter]==1.0):
+            for n in npSubList:
+                subList.append(n)
+            subList.append(X_pred[counter])
+            supList.append(subList)	
+        counter=counter+1
 		
-		counter=counter+1
-		supList.append(subList)
 	
 	dataArray=np.array(supList)
 	print(np.array(supList).shape)
@@ -318,7 +362,7 @@ def WriteToFile(X_test,X_pred,functionName):
 #	dataArray=np.array([supList])
 	
 	np.savetxt(functionName,dataArray,delimiter=' ')
-	
+    '''	
 
 def PlotROCSci(clf,X_test,Y_test):
     X_pred = clf.predict(X_test)

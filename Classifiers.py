@@ -139,6 +139,7 @@ def GradientBoosting(X_train,Y_train,X_Test,Y_test,num_estimators=100,writeToFil
     from sklearn.ensemble import  GradientBoostingClassifier
     clf = GradientBoostingClassifier(n_estimators=num_estimators)
     clf = clf.fit(X_train, Y_train)
+    
     X_pred=clf.predict(X_test)
     score = clf.score(X_test, Y_test)
     print(score)
@@ -151,10 +152,19 @@ def GradientBoosting(X_train,Y_train,X_Test,Y_test,num_estimators=100,writeToFil
 
 
 def DecisionTree(X_train,Y_train,X_Test,Y_test,writeToFile=False):
+    from graphviz import Source
+    from sklearn.tree import export_graphviz
+    from sklearn.externals.six import StringIO
+    import pydotplus
+    from IPython.display import Image
+
     X_test=X_Test[:,0:6]
     print("========== %s Classifier =========" % whoami())
-    clf = tree.DecisionTreeClassifier()
+    clf = tree.DecisionTreeClassifier(criterion="gini",max_depth=4,min_samples_split=5)
     clf = clf.fit(X_train, Y_train)
+
+    
+   
     X_pred=clf.predict(X_test)
     score = clf.score(X_test, Y_test)
     print("Score : "+str(score))
@@ -163,6 +173,15 @@ def DecisionTree(X_train,Y_train,X_Test,Y_test,writeToFile=False):
       	WriteToFile(X_Test,X_pred,whoami())
           
     #PlotROCSci(clf,X_test,Y_test)
+    #graph = Source(export_graphviz(clf, out_file=None, feature_names=['deltaTheta','deltaThetaX','deltaThetaY','deltaX','deltaY','Pr']))
+    dot_data=StringIO()
+    #graph.format = 'png'
+
+    export_graphviz(clf,out_file=dot_data,filled=True,rounded=True,special_characters=True,feature_names=['deltaTheta','deltaThetaX','deltaThetaY','deltaX','deltaY','Pr'])
+    graph=pydotplus.graph_from_dot_data(dot_data.getvalue())
+    graph.write_png("DT.png")
+    Image(graph.create_png())
+    #graph.render('dt', view=True);
     return clf
 
 def AdaBoost(X_train,Y_train,X_Test,Y_test,writeToFile=False):

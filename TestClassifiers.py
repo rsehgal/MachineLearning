@@ -33,8 +33,8 @@ Y_train=Y_train.reshape(X_train.shape[0])
 #GaussianMixtureModel(X_train,Y_train,X_test,Y_test,writeToFile=True)
 
 
-NearestNeighbours(X_train,Y_train,X_test,Y_test,writeToFile=True)
-RandomForest(X_train,Y_train,X_test,Y_test,writeToFile=True,num_estimators=100)
+#NearestNeighbours(X_train,Y_train,X_test,Y_test,writeToFile=True)
+#RandomForest(X_train,Y_train,X_test,Y_test,writeToFile=True,num_estimators=100)
 #print("========= Printing Returned Predicted Values +=============")
 #print(X_pred)
 #GradientBoosting(X_train,Y_train,X_test,Y_test,writeToFile=True)

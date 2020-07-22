@@ -6,11 +6,12 @@ import numpy as np
 
 #dataArr=load_training_data("trainPb.root")
 trainfilename="train.root"
-CreateData(["TMVA_Fe.root","TMVA_Al.root","TMVA_Pb.root","TMVA_U.root"],trainfilename)
+#CreateData(["TMVA_Fe.root","TMVA_Al.root","TMVA_Pb.root","TMVA_U.root"],trainfilename)
+CreateData(["TMVA_Al_100_100_20_20K.root","TMVA_Fe_100_100_20_20K.root","TMVA_Pb_100_100_20_20K.root"],trainfilename)
 #CreateData(["TMVA_Pb.root","TMVA_U.root"],trainfilename)
-
-dataArr=load_training_data("train.root",True)
-testDataArr=load_training_data("test.root",True)
+onlySignal=True
+dataArr=load_training_data("train.root",onlysignal=onlySignal)
+testDataArr=load_training_data("test.root",onlysignal=onlySignal)
 np.random.shuffle(dataArr)
 np.random.shuffle(testDataArr)
 
@@ -26,19 +27,19 @@ X_test=testDataArr[:,0:9]
 Y_test=testDataArr[:,9:10]
 
 
-#KerasClassfier(X_train,Y_train,X_test,Y_test,50)
+KerasClassfier(X_train,Y_train,X_test,Y_test,50)
 
 Y_train=Y_train.reshape(X_train.shape[0])
 
 #GaussianMixtureModel(X_train,Y_train,X_test,Y_test,writeToFile=True)
 
 
-#NearestNeighbours(X_train,Y_train,X_test,Y_test,writeToFile=True)
+NearestNeighbours(X_train,Y_train,X_test,Y_test,writeToFile=True)
 #RandomForest(X_train,Y_train,X_test,Y_test,writeToFile=True,num_estimators=100)
 #print("========= Printing Returned Predicted Values +=============")
 #print(X_pred)
 #GradientBoosting(X_train,Y_train,X_test,Y_test,writeToFile=True)
-DecisionTree(X_train,Y_train,X_test,Y_test,True)
+#DecisionTree(X_train,Y_train,X_test,Y_test,True)
 #LDA(X_train,Y_train,X_test,Y_test,True)
 #NearestNeighbours(X_train,Y_train,X_test,Y_test,True)
 #MLP(X_train,Y_train,X_test,Y_test)

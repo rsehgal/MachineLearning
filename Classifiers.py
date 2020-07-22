@@ -27,32 +27,78 @@ def KerasClassfier(X_train,Y_train,X_Test,Y_test,num_epoch=15):
     from keras.layers import Dense,Dropout
     from keras.utils import to_categorical
 
+    print("Shape of X_train : "+format(X_train.shape))
+    print("Shape of X_test : "+format(X_test.shape))
+    #print("Shape of input : "+format(Y_train.shape))
     inputShape=X_train.shape[1]
     model = Sequential()
-    model.add(Dense(8, input_shape=(inputShape,) , activation = 'relu'))
-  #  model.add(Dropout(0.2))
+    #model.add(Dense(8, input_shape=(inputShape,) , activation = 'relu'))
+    model.add(Dense(8, input_dim=6 , activation = 'relu'))
+    #model.add(Dropout(0.2))
+    
+    numOfNeuron=50
 
-    model.add(Dense(10, activation = 'relu'))
-  #  model.add(Dropout(0.2))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    #model.add(Dropout(0.2))
 
-    model.add(Dense(10, activation = 'relu'))
-  #  model.add(Dropout(0.2))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    #model.add(Dropout(0.2))
 
-    model.add(Dense(10, activation = 'relu'))
-  #  model.add(Dropout(0.1))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dropout(0.1))
+    
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    model.add(Dense(numOfNeuron, activation = 'relu'))
+    #model.add(Dense(10, activation = 'relu'))
+    #model.add(Dense(10, activation = 'relu'))
+    #model.add(Dropout(0.1))
 
     model.add(Dense(4, activation = 'softmax'))
 
+    print("Shape fo Y_train before to_categorical : "+format(Y_train.shape))
     Y_train=to_categorical(Y_train)
     Y_test=to_categorical(Y_test)
+    print(Y_train.shape)
+    print("Y_train classes : "+format(Y_train.shape[1]))
+    print("Y_test classes : "+format(Y_test.shape[1]))
 
     model.compile(loss = 'categorical_crossentropy' , optimizer = 'adam' , metrics = ['accuracy'] )
-    model.fit(X_train, Y_train, epochs = num_epoch, batch_size = 64 ,validation_split=0.20)
-    scores = model.evaluate(X_test, Y_test)
+#    model.fit(X_train, Y_train, epochs = num_epoch, batch_size = 64 ,validation_split=0.20)
+    model.fit(X_train, Y_train, epochs = num_epoch)
+    
+    pred_train= model.predict(X_train)
+    scores = model.evaluate(X_train, Y_train, verbose=0)
+    print('Accuracy on training data: {}% \n Error on training data: {}'.format(scores[1], 1 - scores[1]))
+    
+    pred_test= model.predict(X_test)
+    scores2 = model.evaluate(X_test, Y_test, verbose=0)
+    print('Accuracy on test data: {}% \n Error on test data: {}'.format(scores2[1], 1 - scores2[1]))
+    
+    matrix = confusion_matrix(Y_test.argmax(axis=1), pred_test.argmax(axis=1))
+    print(matrix)
+    
+    #scores = model.evaluate(X_test, Y_test)
+    #score = model.score(X_test, Y_test)
+    #print("Score : "+str(score))
+    '''
     Y_pred = model.predict(X_test)
-    print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+    
+    #print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
     matrix = confusion_matrix(Y_test.argmax(axis=1), Y_pred.argmax(axis=1))
     print(matrix)
+    print(Y_pred.shape)
+    #WriteToFile(X_Test,Y_pred,whoami())
+    '''
+    
 
 def MLP(X_train,Y_train,X_Test,Y_test,num_iter=100,act_func='tanh',writeToFile=False):
     X_test=X_Test[:,0:6]
@@ -247,6 +293,7 @@ def NearestNeighbours(X_train,Y_train,X_Test,Y_test,num_neighbours=3,writeToFile
     score = clf.score(X_test, Y_test)
     print("Score : "+str(score))
     print(confusion_matrix(Y_test,X_pred))
+    print(X_pred.shape)
     if(writeToFile):
       	WriteToFile(X_Test,X_pred,whoami())
     return clf
@@ -349,9 +396,10 @@ def WriteToFile(X_test,X_pred,functionName):
         for n in npSubList:
             subList.append(n)
         subList.append(X_pred[counter])
+        subList.append(0.0)
         
         supListRaw.append(subList)
-        if(X_pred[counter]!=0.0):
+        if(X_pred[counter]>=0.0):
             supList.append(subList)
             
             

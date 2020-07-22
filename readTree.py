@@ -91,9 +91,9 @@ def load_training_data(dataFileName,onlysignal=False):
     print('Backgroundsize')
     print(len(background))
     if(onlysignal):
-        dataArr=signal
+    	dataArr=signal
     else:
-	   dataArr=np.concatenate((signal,background),axis=0)
+    	dataArr=np.concatenate((signal,background),axis=0)
 
     #targetList=[]
     #for e in dataArr:

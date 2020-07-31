@@ -60,7 +60,33 @@ def getBackground(filename):
     infile=TFile(filename)
     background=infile.Background
     return background
+    
+'''
+def reshapeData2(dataArr):
+	supList=[]
+	for e in dataArr:
+		subList=[]
+		for val in e:
+			subList.append(val)
+		supList.append(subList)
+	return np.array(supList)
 
+'''
+#Using same logic as above but using built in function .tolist()	
+def reshapeData2(dataArr):
+    print(type(dataArr[0]))
+    print(dataArr[0].dtype)
+    supList=[]
+    for e in dataArr:
+	    supList.append(e.tolist())
+    return np.array(supList)
+
+
+def getDataFromTree(filename,treename):
+    arr=root2array(filename,treename)
+    return arr
+    #return reshapeData2(arr)
+    #return np.asarray(arr)
 
 def happyBirthday():
     print("Happy Birthday to you!")
@@ -100,16 +126,17 @@ def load_training_data(dataFileName,onlysignal=False):
     #    targetList.append(e[8])
     #targetArr=np.array(targetList)
     return reshapeData(dataArr) #, reshapeData(targetArr)
+    
 
 def reshapeData(dataArr):
+    print(type(dataArr[0]))
     supList=[]
     for e in dataArr:
-        #print(e)
-        subList=[]
+    	subList=[]
         for i in range(15):
-            subList.append(e[i])
+        	subList.append(e[i])
         supList.append(subList)
-    return np.array(supList)
+	return np.array(supList)
 
     '''
     for e in signal:
@@ -118,11 +145,24 @@ def reshapeData(dataArr):
     for e in background:
         targetList.append(e[8])
     '''
+    
+
 
 #main()
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
 #    getSignal()
+    treeData=getDataFromTree("testismran.root","ftree")
+    print("Shape of numpy array of TTree "+format(treeData.shape))
+    print(type(treeData[0]))
+    print(treeData[0].dtype)
+	#print(treeData[0].fBrCh)
+	
+    print(treeData[:60])
+    print(treeData[0][0])
+    print(treeData[0][1])
+    print(treeData[0][2])
+    print(treeData[0][3])
     #signal=getSignal()
     #for e in signal:
     #    print(e.deltaThetaX)

@@ -1,6 +1,7 @@
 import numpy as np
 from root_numpy import root2array, tree2array
 from ROOT import TFile, TTree, TList
+import matplotlib.pyplot as plt
 
 def CreateData(fileList,filename):
     pathList = fileList #['test1.root', 'test2.root']
@@ -146,7 +147,22 @@ def reshapeData(dataArr):
         targetList.append(e[8])
     '''
     
-
+def PairCheck(channelList):
+    dataLength=len(channelList)
+    print("Length of channelList : "+format(dataLength))
+    pairCounter=0
+    for indexNo in range(dataLength):
+        index=indexNo
+        if(index%2==0):
+            #if(abs(channelList[index]-channelList[index+1])==1):
+            if( (channelList[index]+1) == channelList[index+1] or channelList[index] == (channelList[index+1]+1)):
+                pairCounter=pairCounter+1
+            else:
+                print("Pair Not Found : Index : "+format(index))
+                break
+                
+    print("Number of Pairs : "+format(pairCounter))
+    return True
 
 #main()
 
@@ -158,11 +174,40 @@ if __name__ == "__main__":
     print(treeData[0].dtype)
 	#print(treeData[0].fBrCh)
 	
-    print(treeData[:60])
+    print(treeData[320:350])
     print(treeData[0][0])
     print(treeData[0][1])
     print(treeData[0][2])
     print(treeData[0][3])
+    print("====================")
+
+    treeDataLength=len(treeData)
+    print("Tree Data Length : "+format(treeDataLength) )
+    tsList=[]
+    channelList=[]
+    for index in range(treeDataLength):
+        tsList.append(treeData[index][1])
+        channelList.append(treeData[index][0])
+    
+
+    PairCheck(channelList)
+    '''
+    #Commenting for the time being, otherwise working logic    
+    minimumTS=min(tsList)
+    print("Minimum TS : "+format(minimumTS))
+    
+    histDurationInSec=120
+    histDurationInPicoSec=histDurationInSec*1e+12
+    steps=1000000000
+    print("histDurationInPicoSec : "+format(histDurationInPicoSec))
+    bins=np.arange(minimumTS , (minimumTS+histDurationInPicoSec) , steps )
+    print("Bins Shape  : "+format(bins.shape))
+    plt.hist(tsList,bins=bins)
+    plt.show()
+    '''
+    
+    
+
     #signal=getSignal()
     #for e in signal:
     #    print(e.deltaThetaX)
